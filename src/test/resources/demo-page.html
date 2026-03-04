@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- 
+        Frontend de demostración para pruebas de Esperas Explícitas
+        Este HTML simula un caso REAL de aplicación web con contenido dinámico
+        que requiere sincronización adecuada en las pruebas automatizadas
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Esperas Explícitas en Selenium</title>
+    <style>
+        /* Estilos para simular una aplicación web profesional */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        /* Estilo para botones */
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Estilos para mensajes dinámicos */
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+
+        /* Loader animado para simular carga asíncrona */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Estilos para elementos que aparecen dinámicamente */
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estilos para formulario */
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Indicador de estado */
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-ready {
+            background: #28a745;
+        }
+
+        .status-loading {
+            background: #ffc107;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Demo: Esperas Explícitas con Selenium</h1>
+        
+        <!-- 
+            SECCIÓN 1: Botón con respuesta demorada
+            Simula una llamada API que tarda 3 segundos
+            SIN esperas explícitas: El test intentará hacer click antes de que aparezca
+        -->
+        <div class="section">
+            <h2>📡 Escenario 1: Elemento que Aparece Después de Carga Asíncrona</h2>
+            <button id="btnLoadContent" onclick="loadAsyncContent()">Cargar Contenido Remoto</button>
+            
+            <!-- Este div permanece oculto hasta que se complete la "carga" -->
+            <div id="loadingIndicator" class="hidden">
+                <div class="loader"></div>
+                <p style="text-align: center; color: #666;">Cargando datos del servidor...</p>
+            </div>
+            
+            <!-- Este botón aparece después de 3 segundos -->
+            <div id="asyncContent" class="hidden"></div>
+            
+            <div class="note">
+                <strong>⚠️ Problema sin esperas:</strong> El test buscará el botón "Procesar Datos" 
+                inmediatamente, pero este no existe aún. Resultado: NoSuchElementException
+            </div>
+        </div>
+
+        <!-- 
+            SECCIÓN 2: Elemento que se hace clickeable después de un tiempo
+            Simula un botón deshabilitado que se habilita después de validación
+        -->
+        <div class="section">
+            <h2>⏱️ Escenario 2: Elemento que se Vuelve Clickeable</h2>
+            <input type="text" id="username" placeholder="Ingrese nombre de usuario" 
+                   oninput="validateForm()">
+            
+            <!-- Botón inicialmente deshabilitado -->
+            <button id="btnSubmit" disabled onclick="submitForm()">
+                Enviar Formulario
+            </button>
+            
+            <div id="submitResult" class="hidden"></div>
+            
+            <div class="note">
+                <strong>⚠️ Problema sin esperas:</strong> El test intentará hacer click en un botón 
+                deshabilitado. Resultado: ElementNotInteractableException
+            </div>
+        </div>
+
+        <!-- 
+            SECCIÓN 3: Texto que cambia dinámicamente
+            Simula actualización de estado en tiempo real
+        -->
+        <div class="section">
+            <h2>🔄 Escenario 3: Texto que Cambia Dinámicamente</h2>
+            <button id="btnUpdateStatus" onclick="updateStatus()">Iniciar Proceso</button>
+            
+            <div id="statusDisplay" style="margin-top: 20px; font-size: 18px;">
+                <span class="status-indicator status-ready"></span>
+                <span id="statusText">Sistema listo</span>
+            </div>
+            
+            <div class="note">
+                <strong>⚠️ Problema sin esperas:</strong> El test verificará el texto antes de que 
+                cambie. Resultado: Validación incorrecta o test flaky
+            </div>
+        </div>
+
+        <!-- 
+            SECCIÓN 4: Elemento que desaparece (Visibility Toggle)
+            Útil para modales, mensajes temporales, overlays
+        -->
+        <div class="section">
+            <h2>👁️ Escenario 4: Elemento que Desaparece</h2>
+            <button id="btnShowAlert" onclick="showTemporaryAlert()">Mostrar Alerta Temporal</button>
+            
+            <div id="temporaryAlert" class="hidden"></div>
+            
+            <button id="btnAfterAlert" class="hidden" onclick="afterAlertAction()">
+                Acción Después de Alerta
+            </button>
+            
+            <div id="afterAlertResult" class="hidden"></div>
+            
+            <div class="note">
+                <strong>⚠️ Problema sin esperas:</strong> El test intentará interactuar antes de que 
+                el overlay/modal desaparezca. Resultado: ElementClickInterceptedException
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================
+           FUNCIONES JAVASCRIPT PARA SIMULAR COMPORTAMIENTO ASÍNCRONO
+           Estas funciones representan situaciones REALES en aplicaciones web modernas
+        ========================================== */
+
+        /**
+         * ESCENARIO 1: Simula carga asíncrona como una llamada API
+         * El contenido aparece después de 3 segundos
+         * Esto es común en: dashboards, tablas con paginación, modales con datos remotos
+         */
+        function loadAsyncContent() {
+            // Deshabilitar botón para evitar múltiples clicks
+            const btn = document.getElementById('btnLoadContent');
+            btn.disabled = true;
+            btn.textContent = 'Cargando...';
+            
+            // Mostrar indicador de carga
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+            
+            // Simular delay de red (3 segundos)
+            setTimeout(function() {
+                // Ocultar loader
+                document.getElementById('loadingIndicator').classList.add('hidden');
+                
+                // Mostrar contenido con animación
+                const contentDiv = document.getElementById('asyncContent');
+                contentDiv.innerHTML = `
+                    <div class="message success fade-in">
+                        ✅ Datos cargados exitosamente
+                    </div>
+                    <button id="btnProcessData" onclick="processData()" 
+                            style="margin-top: 15px;">
+                        Procesar Datos
+                    </button>
+                `;
+                contentDiv.classList.remove('hidden');
+                
+                // Restaurar botón original
+                btn.disabled = false;
+                btn.textContent = 'Cargar Contenido Remoto';
+            }, 3000); // 3 segundos de espera
+        }
+
+        /**
+         * Función llamada cuando se hace click en "Procesar Datos"
+         */
+        function processData() {
+            const contentDiv = document.getElementById('asyncContent');
+            contentDiv.innerHTML += `
+                <div class="message info fade-in" id="processResult">
+                    🎯 Datos procesados correctamente
+                </div>
+            `;
+        }
+
+        /**
+         * ESCENARIO 2: Validación de formulario con habilitación retardada
+         * El botón se habilita 2 segundos después de ingresar texto
+         * Esto simula: validaciones asíncronas, verificación de disponibilidad, etc.
+         */
+        let validationTimeout;
+        function validateForm() {
+            const username = document.getElementById('username').value;
+            const btn = document.getElementById('btnSubmit');
+            
+            // Cancelar validación anterior si existe
+            clearTimeout(validationTimeout);
+            
+            // Deshabilitar botón mientras se valida
+            btn.disabled = true;
+            btn.textContent = 'Validando...';
+            
+            if (username.length >= 3) {
+                // Simular validación asíncrona (2 segundos)
+                validationTimeout = setTimeout(function() {
+                    btn.disabled = false;
+                    btn.textContent = '✓ Enviar Formulario';
+                }, 2000);
+            } else {
+                btn.textContent = 'Enviar Formulario';
+            }
+        }
+
+        /**
+         * Envío de formulario
+         */
+        function submitForm() {
+            const username = document.getElementById('username').value;
+            const resultDiv = document.getElementById('submitResult');
+            
+            resultDiv.innerHTML = `
+                <div class="message success fade-in">
+                    ✅ Formulario enviado con éxito para: <strong>${username}</strong>
+                </div>
+            `;
+            resultDiv.classList.remove('hidden');
+        }
+
+        /**
+         * ESCENARIO 3: Actualización de estado con múltiples cambios
+         * Simula un proceso que pasa por diferentes estados
+         * Común en: progreso de carga, estados de pedidos, pipelines de CI/CD
+         */
+        function updateStatus() {
+            const btn = document.getElementById('btnUpdateStatus');
+            const statusText = document.getElementById('statusText');
+            const indicator = document.querySelector('.status-indicator');
+            
+            btn.disabled = true;
+            
+            // Estado 1: Iniciando (inmediato)
+            indicator.classList.remove('status-ready');
+            indicator.classList.add('status-loading');
+            statusText.textContent = 'Iniciando proceso...';
+            
+            // Estado 2: Procesando (después de 2 segundos)
+            setTimeout(function() {
+                statusText.textContent = 'Procesando datos...';
+            }, 2000);
+            
+            // Estado 3: Finalizando (después de 4 segundos)
+            setTimeout(function() {
+                statusText.textContent = 'Finalizando...';
+            }, 4000);
+            
+            // Estado 4: Completado (después de 6 segundos)
+            setTimeout(function() {
+                indicator.classList.remove('status-loading');
+                indicator.classList.add('status-ready');
+                statusText.textContent = 'Proceso completado exitosamente';
+                btn.disabled = false;
+            }, 6000);
+        }
+
+        /**
+         * ESCENARIO 4: Alerta temporal que desaparece
+         * Simula notificaciones, toasts, overlays
+         * El siguiente elemento se hace visible después de que desaparece el modal
+         */
+        function showTemporaryAlert() {
+            const alertDiv = document.getElementById('temporaryAlert');
+            const btn = document.getElementById('btnShowAlert');
+            
+            btn.disabled = true;
+            
+            // Mostrar alerta
+            alertDiv.innerHTML = `
+                <div class="message info fade-in">
+                    ⚠️ Procesando solicitud... Por favor espere
+                </div>
+            `;
+            alertDiv.classList.remove('hidden');
+            
+            // Ocultar alerta después de 3 segundos
+            setTimeout(function() {
+                alertDiv.classList.add('hidden');
+                
+                // Mostrar siguiente acción
+                const nextBtn = document.getElementById('btnAfterAlert');
+                nextBtn.classList.remove('hidden');
+                nextBtn.classList.add('fade-in');
+                
+                btn.disabled = false;
+            }, 3000);
+        }
+
+        /**
+         * Acción después de que desaparece la alerta
+         */
+        function afterAlertAction() {
+            const resultDiv = document.getElementById('afterAlertResult');
+            resultDiv.innerHTML = `
+                <div class="message success fade-in">
+                    ✅ Acción ejecutada correctamente
+                </div>
+            `;
+            resultDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
