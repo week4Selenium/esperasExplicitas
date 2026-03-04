@@ -1,0 +1,152 @@
+package base;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+
+import java.io.File;
+import java.time.Duration;
+
+/**
+ * Clase base para todos los tests de automatización
+ * 
+ * PROPÓSITO:
+ * Esta clase contiene la configuración común que necesitan todos los tests:
+ * - Inicialización del WebDriver
+ * - Configuración del navegador
+ * - Limpieza después de cada test
+ * 
+ * POR QUÉ USAR UNA CLASE BASE:
+ * - Evita duplicación de código en cada test
+ * - Centraliza la configuración del navegador
+ * - Facilita cambios futuros (ej: cambiar de Chrome a Firefox)
+ * - Aplica el principio DRY (Don't Repeat Yourself)
+ */
+public class BaseTest {
+    
+    // Variable protegida para que las clases hijas puedan acceder al driver
+    protected WebDriver driver;
+    
+    // URL del HTML local que vamos a probar
+    // Se calcula dinámicamente para que funcione en cualquier máquina
+    protected String pageUrl;
+    
+    /**
+     * Método que se ejecuta ANTES de cada test
+     * Anotación @BeforeEach de JUnit 5 indica que este método se ejecuta antes de cada @Test
+     * 
+     * RESPONSABILIDADES:
+     * 1. Configurar el driver del navegador automáticamente (sin descargas manuales)
+     * 2. Crear instancia del navegador Chrome
+     * 3. Configurar opciones del navegador
+     * 4. Preparar la URL del archivo HTML local
+     */
+    @BeforeEach
+    public void setUp() {
+        // WebDriverManager descarga automáticamente el chromedriver correcto
+        // Elimina la necesidad de descargar y configurar drivers manualmente
+        WebDriverManager.chromedriver().setup();
+        
+        // Configuración de opciones de Chrome para una ejecución más estable
+        ChromeOptions options = new ChromeOptions();
+        
+        // OPCIONES IMPORTANTES PARA TESTS:
+        
+        // Deshabilita las notificaciones del navegador que podrían interferir con los tests
+        options.addArguments("--disable-notifications");
+        
+        // Desactiva las extensiones del navegador para tener un entorno limpio
+        options.addArguments("--disable-extensions");
+        
+        // Deshabilita la GPU, útil en entornos de CI/CD sin interfaz gráfica
+        options.addArguments("--disable-gpu");
+        
+        // Desactiva la barra de información "Chrome está siendo controlado por software automatizado"
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        
+        // Deshabilita el flag "enable-automation" para evitar detección de automatización
+        options.setExperimentalOption("useAutomationExtension", false);
+        
+        // Opcional: Para ejecutar en modo headless (sin interfaz gráfica)
+        // Descomenta la siguiente línea para ejecutar sin abrir ventana del navegador
+        // options.addArguments("--headless");
+        
+        // Crear instancia de ChromeDriver con las opciones configuradas
+        driver = new ChromeDriver(options);
+        
+        // CONFIGURACIÓN DEL DRIVER:
+        
+        // Maximizar la ventana del navegador
+        // Importante porque algunos elementos pueden no ser visibles en ventanas pequeñas
+        driver.manage().window().maximize();
+        
+        // NOTA SOBRE IMPLICIT WAITS:
+        // NO usamos implicit waits aquí intencionalmente porque queremos demostrar
+        // el uso correcto de ESPERAS EXPLÍCITAS (Explicit Waits)
+        // 
+        // driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10)); // ❌ NO USAR
+        //
+        // RAZÓN: Los implicit waits son globales y pueden ocultar problemas de sincronización
+        // Las esperas explícitas son más precisas y profesionales
+        
+        // Construir la URL del archivo HTML local
+        // Usamos file:// protocol para cargar archivos locales
+        File htmlFile = new File("src/test/resources/demo-page.html");
+        pageUrl = "file:///" + htmlFile.getAbsolutePath().replace("\\", "/");
+        
+        System.out.println("==============================================");
+        System.out.println("✓ WebDriver inicializado correctamente");
+        System.out.println("✓ Navegador: Chrome");
+        System.out.println("✓ URL de la página: " + pageUrl);
+        System.out.println("==============================================");
+    }
+    
+    /**
+     * Método que se ejecuta DESPUÉS de cada test
+     * Anotación @AfterEach de JUnit 5 indica que este método se ejecuta después de cada @Test
+     * 
+     * RESPONSABILIDADES:
+     * - Cerrar el navegador y liberar recursos
+     * - Asegurar que cada test empieza con un navegador limpio
+     * 
+     * POR QUÉ ES IMPORTANTE:
+     * - Evita fugas de memoria al no cerrar navegadores
+     * - Previene interferencias entre tests
+     * - Mantiene el entorno de pruebas limpio
+     */
+    @AfterEach
+    public void tearDown() {
+        // Verificar que el driver no sea null antes de intentar cerrarlo
+        if (driver != null) {
+            // quit() cierra todas las ventanas y finaliza la sesión del WebDriver
+            // Diferencia con close(): close() solo cierra la ventana actual
+            driver.quit();
+            
+            System.out.println("==============================================");
+            System.out.println("✓ WebDriver cerrado correctamente");
+            System.out.println("==============================================");
+        }
+    }
+    
+    /**
+     * Método auxiliar para obtener el WebDriver
+     * Útil si otras clases necesitan acceso al driver
+     * 
+     * @return WebDriver - instancia actual del navegador
+     */
+    protected WebDriver getDriver() {
+        return driver;
+    }
+    
+    /**
+     * Método auxiliar para abrir la página de prueba
+     * Centraliza la navegación a la página HTML local
+     */
+    protected void openTestPage() {
+        driver.get(pageUrl);
+        System.out.println("→ Página de prueba cargada: " + driver.getTitle());
+    }
+}
