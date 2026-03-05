@@ -5,180 +5,150 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.File;
-import java.time.Duration;
 
 /**
  * Clase base para todos los tests de automatización
  * 
  * PROPÓSITO:
  * Esta clase contiene la configuración común que necesitan todos los tests:
- * - Inicialización del WebDriver
+ * - Inicialización del WebDriver con control explícito del ChromeDriverService
  * - Configuración del navegador
- * - Limpieza después de cada test
+ * - Limpieza GARANTIZADA después de cada test (sin procesos zombie)
  * 
- * POR QUÉ USAR UNA CLASE BASE:
- * - Evita duplicación de código en cada test
- * - Centraliza la configuración del navegador
- * - Facilita cambios futuros (ej: cambiar de Chrome a Firefox)
- * - Aplica el principio DRY (Don't Repeat Yourself)
+ * SOLUCIÓN PROFESIONAL IMPLEMENTADA:
+ * - ChromeDriverService explícito para control total del ciclo de vida
+ * - Cierre correcto tanto del driver como del service
+ * - Sin procesos Chrome/ChromeDriver quedando abiertos
  */
 public class BaseTest {
     
     // Variable protegida para que las clases hijas puedan acceder al driver
     protected WebDriver driver;
     
+    // ChromeDriverService para control explícito del proceso ChromeDriver
+    // CRÍTICO: Esto garantiza que el proceso se cierre correctamente
+    private ChromeDriverService service;
+    
     // URL del HTML local que vamos a probar
-    // Se calcula dinámicamente para que funcione en cualquier máquina
     protected String pageUrl;
     
     // ⏱️ DELAY PARA DEMOSTRACIONES
     // Tiempo de pausa (en milisegundos) después de cada acción
-    // para que las personas puedan ver la automatización en pantalla
     // 1500ms = 1.5 segundos por acción (ajusta según necesidad)
     protected static final int DEMO_DELAY = 1500;
     
     /**
-     * Método que se ejecuta ANTES de cada test
-     * Anotación @BeforeEach de JUnit 5 indica que este método se ejecuta antes de cada @Test
+     * Método que se ejecuta ANTES de cada test (@BeforeEach)
      * 
-     * RESPONSABILIDADES:
-     * 1. Configurar el driver del navegador automáticamente (sin descargas manuales)
-     * 2. Crear instancia del navegador Chrome
-     * 3. Configurar opciones del navegador
-     * 4. Preparar la URL del archivo HTML local
+     * CONFIGURACIÓN PROFESIONAL:
+     * 1. Crear ChromeDriverService explícitamente (control del proceso)
+     * 2. Configurar ChromeOptions (opciones del navegador)
+     * 3. Crear ChromeDriver pasando service + options
+     * 4. Configurar el driver y URL de prueba
      */
     @BeforeEach
     public void setUp() {
-        // WebDriverManager descarga automáticamente el chromedriver correcto
-        // Elimina la necesidad de descargar y configurar drivers manualmente
-        WebDriverManager.chromedriver().setup();
-        
-        // Configuración de opciones de Chrome para una ejecución más estable
-        ChromeOptions options = new ChromeOptions();
-        
-        // OPCIONES IMPORTANTES PARA TESTS:
-        
-        // Deshabilita las notificaciones del navegador que podrían interferir con los tests
-        options.addArguments("--disable-notifications");
-        
-        // Desactiva las extensiones del navegador para tener un entorno limpio
-        options.addArguments("--disable-extensions");
-        
-        // Deshabilita la GPU, útil en entornos de CI/CD sin interfaz gráfica
-        options.addArguments("--disable-gpu");
-        
-        // OPCIONES PARA EVITAR PROCESOS ZOMBIE:
-        
-        // Previene que Chrome continúe ejecutándose en segundo plano
-        options.addArguments("--disable-background-networking");
-        options.addArguments("--disable-background-timer-throttling");
-        options.addArguments("--disable-backgrounding-occluded-windows");
-        options.addArguments("--disable-client-side-phishing-detection");
-        options.addArguments("--disable-default-apps");
-        options.addArguments("--disable-hang-monitor");
-        options.addArguments("--disable-popup-blocking");
-        options.addArguments("--disable-prompt-on-repost");
-        options.addArguments("--disable-sync");
-        options.addArguments("--no-first-run");
-        options.addArguments("--no-service-autorun");
-        options.addArguments("--password-store=basic");
-        options.addArguments("--use-mock-keychain");
-        
-        // Desactiva la barra de información "Chrome está siendo controlado por software automatizado"
-        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
-        
-        // Deshabilita el flag "enable-automation" para evitar detección de automatización
-        options.setExperimentalOption("useAutomationExtension", false);
-        
-        // Opcional: Para ejecutar en modo headless (sin interfaz gráfica)
-        // Descomenta la siguiente línea para ejecutar sin abrir ventana del navegador
-        // options.addArguments("--headless");
-        
-        // Crear instancia de ChromeDriver con las opciones configuradas
-        driver = new ChromeDriver(options);
-        
-        // CONFIGURACIÓN DEL DRIVER:
-        
-        // Maximizar la ventana del navegador
-        // Importante porque algunos elementos pueden no ser visibles en ventanas pequeñas
-        driver.manage().window().maximize();
-        
-        // NOTA SOBRE IMPLICIT WAITS:
-        // NO usamos implicit waits aquí intencionalmente porque queremos demostrar
-        // el uso correcto de ESPERAS EXPLÍCITAS (Explicit Waits)
-        // 
-        // driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10)); // ❌ NO USAR
-        //
-        // RAZÓN: Los implicit waits son globales y pueden ocultar problemas de sincronización
-        // Las esperas explícitas son más precisas y profesionales
-        
-        // Construir la URL del archivo HTML local
-        // Usamos file:// protocol para cargar archivos locales
-        File htmlFile = new File("src/test/resources/demo-page.html");
-        pageUrl = "file:///" + htmlFile.getAbsolutePath().replace("\\", "/");
-        
-        System.out.println("==============================================");
-        System.out.println("✓ WebDriver inicializado correctamente");
-        System.out.println("✓ Navegador: Chrome");
-        System.out.println("✓ URL de la página: " + pageUrl);
-        System.out.println("==============================================");
+        try {
+            // PASO 1: Configurar WebDriverManager (descarga chromedriver si no existe)
+            WebDriverManager.chromedriver().setup();
+            
+            // PASO 2: Crear ChromeDriverService EXPLÍCITAMENTE
+            // Esto es CRÍTICO para poder cerrar el servicio completamente después
+            service = new ChromeDriverService.Builder()
+                .usingAnyFreePort()  // Usa cualquier puerto disponible (evita conflictos)
+                .build();
+            
+            // PASO 3: Configurar ChromeOptions
+            ChromeOptions options = new ChromeOptions();
+            
+            // Opciones básicas
+            options.addArguments("--disable-notifications");
+            options.addArguments("--disable-extensions");
+            options.addArguments("--disable-gpu");
+            
+            // OPCIONES CRÍTICAS para evitar procesos zombie:
+            options.addArguments("--disable-dev-shm-usage");  // Evita problemas de memoria compartida
+            options.addArguments("--no-sandbox");  // Desactiva sandbox (útil en CI/CD)
+            options.addArguments("--remote-debugging-port=0");  // Sin puerto de debugging
+            
+            // Ocultar barra de automatización
+            options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+            options.setExperimentalOption("useAutomationExtension", false);
+            
+            // PASO 4: Crear ChromeDriver pasando SERVICE y OPTIONS
+            // Esto nos da control total sobre el ciclo de vida
+            driver = new ChromeDriver(service, options);
+            
+            // PASO 5: Configurar el driver
+            driver.manage().window().maximize();
+            
+            // PASO 6: Preparar URL de la página de prueba
+            File htmlFile = new File("src/test/resources/demo-page.html");
+            pageUrl = "file:///" + htmlFile.getAbsolutePath().replace("\\", "/");
+            
+            System.out.println("==============================================");
+            System.out.println("✓ WebDriver inicializado correctamente");
+            System.out.println("✓ Navegador: Chrome");
+            System.out.println("✓ URL de la página: " + pageUrl);
+            System.out.println("==============================================");
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error en setUp: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
     
     /**
-     * Método que se ejecuta DESPUÉS de cada test
-     * Anotación @AfterEach de JUnit 5 indica que este método se ejecuta después de cada @Test
+     * Método que se ejecuta DESPUÉS de cada test (@AfterEach)
      * 
-     * RESPONSABILIDADES:
-     * - Cerrar el navegador y liberar recursos
-     * - Asegurar que cada test empieza con un navegador limpio
+     * SOLUCIÓN PROFESIONAL - CIERRE COMPLETO:
+     * 1. Cerrar WebDriver (driver.quit)
+     * 2. Detener ChromeDriverService (service.stop) - CRÍTICO
+     * 3. Limpiar referencias en bloque finally
      * 
-     * POR QUÉ ES IMPORTANTE:
-     * - Evita fugas de memoria al no cerrar navegadores
-     * - Previene interferencias entre tests
-     * - Mantiene el entorno de pruebas limpio
-     * 
-     * MEJORAS IMPLEMENTADAS:
-     * - Manejo robusto de errores
-     * - Cierre forzado si quit() falla
-     * - Limpieza de recursos garantizada
+     * ESTO GARANTIZA:
+     * - NO quedan procesos chrome.exe abiertos
+     * - NO quedan procesos chromedriver.exe abiertos
+     * - Los tests se pueden ejecutar múltiples veces consecutivas sin problemas
      */
     @AfterEach
     public void tearDown() {
-        // Verificar que el driver no sea null antes de intentar cerrarlo
-        if (driver != null) {
-            try {
-                // quit() cierra todas las ventanas y finaliza la sesión del WebDriver
-                // Diferencia con close(): close() solo cierra la ventana actual
-                driver.quit();
-                
-                System.out.println("==============================================");
-                System.out.println("✓ WebDriver cerrado correctamente");
-                System.out.println("==============================================");
-                
-            } catch (Exception e) {
-                // Si quit() falla, intentar limpiar de todas formas
-                System.err.println("⚠️ Advertencia: Error al cerrar WebDriver: " + e.getMessage());
+        try {
+            // PASO 1: Cerrar el WebDriver
+            if (driver != null) {
                 try {
-                    // Intentar cerrar de forma más agresiva
-                    driver.close();
-                } catch (Exception e2) {
-                    System.err.println("⚠️ No se pudo cerrar el navegador. Puede que haya procesos zombie.");
+                    driver.quit();  // Cierra todas las ventanas y finaliza la sesión
+                } catch (Exception e) {
+                    System.err.println("⚠️ Error cerrando driver: " + e.getMessage());
                 }
-            } finally {
-                // Asegurar que la referencia se limpie
-                driver = null;
             }
+            
+            // PASO 2: Detener el ChromeDriverService (CRÍTICO)
+            // Esto mata el proceso chromedriver.exe completamente
+            if (service != null && service.isRunning()) {
+                service.stop();
+            }
+            
+            System.out.println("==============================================");
+            System.out.println("✓ WebDriver y ChromeDriverService cerrados");
+            System.out.println("==============================================");
+            
+        } catch (Exception e) {
+            System.err.println("⚠️ Error en tearDown: " + e.getMessage());
+        } finally {
+            // PASO 3: Limpiar referencias (GARANTIZADO por finally)
+            driver = null;
+            service = null;
         }
     }
     
     /**
      * Método auxiliar para obtener el WebDriver
-     * Útil si otras clases necesitan acceso al driver
-     * 
-     * @return WebDriver - instancia actual del navegador
      */
     protected WebDriver getDriver() {
         return driver;
@@ -186,7 +156,6 @@ public class BaseTest {
     
     /**
      * Método auxiliar para abrir la página de prueba
-     * Centraliza la navegación a la página HTML local
      */
     protected void openTestPage() {
         driver.get(pageUrl);
@@ -196,28 +165,16 @@ public class BaseTest {
     /**
      * Pausa para demostración
      * 
-     * PROPÓSITO DE ESTE MÉTODO:
+     * PROPÓSITO:
      * Durante demostraciones en vivo o presentaciones a clientes,
-     * hace que la automatización sea más lenta y VISIBLE para que
-     * las personas puedan seguir cada paso de la ejecución.
+     * hace que la automatización sea más lenta y VISIBLE.
      * 
-     * CUÁNDO USAR:
-     * - Presentaciones a clientes o stakeholders
-     * - Videos de capacitación
-     * - Demostraciones en vivo
-     * 
-     * CUÁNDO NO USAR:
-     * - Ejecución en pipelines de CI/CD (comentar las llamadas)
-     * - Pruebas de rendimiento
-     * - Ejecución masiva de tests
-     * 
-     * @param milliseconds - tiempo de pausa en milisegundos (1000ms = 1 segundo)
+     * @param milliseconds - tiempo de pausa en milisegundos
      */
     protected void pauseForDemo(int milliseconds) {
         try {
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
-            // Si se interrumpe el sleep, restaurar el estado de interrupción
             Thread.currentThread().interrupt();
             System.out.println("⚠️ Pausa de demostración interrumpida");
         }
@@ -225,7 +182,6 @@ public class BaseTest {
     
     /**
      * Pausa para demostración usando el delay por defecto
-     * Usa la constante DEMO_DELAY definida en la clase
      */
     protected void pauseForDemo() {
         pauseForDemo(DEMO_DELAY);
