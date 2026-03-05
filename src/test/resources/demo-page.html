@@ -209,7 +209,49 @@
             </div>
         </div>
 
+               <!-- 
+            SECCIÓN 4: Elemento que desaparece (Visibility Toggle)
+            Útil para modales, mensajes temporales, overlays
+        -->
+        <div class="section">
+            <h2>👁️ Escenario 4: Elemento que Desaparece</h2>
+            <button id="btnShowAlert" onclick="showTemporaryAlert()">Mostrar Alerta Temporal</button>
+            
+            <div id="temporaryAlert" class="hidden"></div>
+            
+            <button id="btnAfterAlert" class="hidden" onclick="afterAlertAction()">
+                Acción Después de Alerta
+            </button>
+            
+            <div id="afterAlertResult" class="hidden"></div>
+            
+            <div class="note">
+                <strong>⚠️ Problema sin esperas:</strong> El test intentará interactuar antes de que 
+                el overlay/modal desaparezca. Resultado: ElementClickInterceptedException
+            </div>
+        </div>
+
+      
         <!-- 
+            SECCIÓN 3: Texto que cambia dinámicamente
+            Simula actualización de estado en tiempo real
+        -->
+        <div class="section">
+            <h2>🔄 Escenario 3: Texto que Cambia Dinámicamente</h2>
+            <button id="btnUpdateStatus" onclick="updateStatus()">Iniciar Proceso</button>
+            
+            <div id="statusDisplay" style="margin-top: 20px; font-size: 18px;">
+                <span class="status-indicator status-ready"></span>
+                <span id="statusText">Sistema listo</span>
+            </div>
+            
+            <div class="note">
+                <strong>⚠️ Problema sin esperas:</strong> El test verificará el texto antes de que 
+                cambie. Resultado: Validación incorrecta o test flaky
+            </div>
+        </div>
+
+  <!-- 
             SECCIÓN 2: Elemento que se hace clickeable después de un tiempo
             Simula un botón deshabilitado que se habilita después de validación
         -->
@@ -231,46 +273,6 @@
             </div>
         </div>
 
-        <!-- 
-            SECCIÓN 3: Texto que cambia dinámicamente
-            Simula actualización de estado en tiempo real
-        -->
-        <div class="section">
-            <h2>🔄 Escenario 3: Texto que Cambia Dinámicamente</h2>
-            <button id="btnUpdateStatus" onclick="updateStatus()">Iniciar Proceso</button>
-            
-            <div id="statusDisplay" style="margin-top: 20px; font-size: 18px;">
-                <span class="status-indicator status-ready"></span>
-                <span id="statusText">Sistema listo</span>
-            </div>
-            
-            <div class="note">
-                <strong>⚠️ Problema sin esperas:</strong> El test verificará el texto antes de que 
-                cambie. Resultado: Validación incorrecta o test flaky
-            </div>
-        </div>
-
-        <!-- 
-            SECCIÓN 4: Elemento que desaparece (Visibility Toggle)
-            Útil para modales, mensajes temporales, overlays
-        -->
-        <div class="section">
-            <h2>👁️ Escenario 4: Elemento que Desaparece</h2>
-            <button id="btnShowAlert" onclick="showTemporaryAlert()">Mostrar Alerta Temporal</button>
-            
-            <div id="temporaryAlert" class="hidden"></div>
-            
-            <button id="btnAfterAlert" class="hidden" onclick="afterAlertAction()">
-                Acción Después de Alerta
-            </button>
-            
-            <div id="afterAlertResult" class="hidden"></div>
-            
-            <div class="note">
-                <strong>⚠️ Problema sin esperas:</strong> El test intentará interactuar antes de que 
-                el overlay/modal desaparezca. Resultado: ElementClickInterceptedException
-            </div>
-        </div>
     </div>
 
     <script>

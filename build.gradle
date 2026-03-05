@@ -35,6 +35,10 @@ test {
         exceptionFormat "full"
         showStandardStreams = true
     }
+    
+    // Configuración para evitar ejecución duplicada
+    maxParallelForks = 1  // Ejecutar tests secuencialmente
+    forkEvery = 0          // No crear nuevos procesos entre tests
 }
 
 // Configuración de encoding y versión de Java
@@ -46,4 +50,29 @@ java {
 // Configuración de encoding UTF-8 para evitar problemas con caracteres especiales
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+}
+
+// Mensaje informativo para limpiar cache (ejecutar: gradle clean --stop)
+task info {
+    group = 'help'
+    description = 'Muestra informaci\u00f3n sobre c\u00f3mo limpiar el proyecto y cache'
+    doLast {
+        println '''
+\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+\ud83d\udee0\ufe0f  C\u00d3MO LIMPIAR EL PROYECTO Y CACHE
+\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+
+1. Limpieza B\u00c1SICA (elimina carpeta build/):
+   .\\gradlew.bat clean
+
+2. Limpieza COMPLETA (build + detiene daemon + limpia cache):
+   .\\gradlew.bat clean --stop
+
+3. Limpieza TOTAL (manual - cierra tu editor primero):
+   - Ejecuta: .\\gradlew.bat --stop
+   - Elimina manualmente las carpetas: build/ y .gradle/
+   
+\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+        '''
+    }
 }
