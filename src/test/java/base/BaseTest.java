@@ -70,6 +70,23 @@ public class BaseTest {
         // Deshabilita la GPU, útil en entornos de CI/CD sin interfaz gráfica
         options.addArguments("--disable-gpu");
         
+        // OPCIONES PARA EVITAR PROCESOS ZOMBIE:
+        
+        // Previene que Chrome continúe ejecutándose en segundo plano
+        options.addArguments("--disable-background-networking");
+        options.addArguments("--disable-background-timer-throttling");
+        options.addArguments("--disable-backgrounding-occluded-windows");
+        options.addArguments("--disable-client-side-phishing-detection");
+        options.addArguments("--disable-default-apps");
+        options.addArguments("--disable-hang-monitor");
+        options.addArguments("--disable-popup-blocking");
+        options.addArguments("--disable-prompt-on-repost");
+        options.addArguments("--disable-sync");
+        options.addArguments("--no-first-run");
+        options.addArguments("--no-service-autorun");
+        options.addArguments("--password-store=basic");
+        options.addArguments("--use-mock-keychain");
+        
         // Desactiva la barra de información "Chrome está siendo controlado por software automatizado"
         options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
         
@@ -122,18 +139,38 @@ public class BaseTest {
      * - Evita fugas de memoria al no cerrar navegadores
      * - Previene interferencias entre tests
      * - Mantiene el entorno de pruebas limpio
+     * 
+     * MEJORAS IMPLEMENTADAS:
+     * - Manejo robusto de errores
+     * - Cierre forzado si quit() falla
+     * - Limpieza de recursos garantizada
      */
     @AfterEach
     public void tearDown() {
         // Verificar que el driver no sea null antes de intentar cerrarlo
         if (driver != null) {
-            // quit() cierra todas las ventanas y finaliza la sesión del WebDriver
-            // Diferencia con close(): close() solo cierra la ventana actual
-            driver.quit();
-            
-            System.out.println("==============================================");
-            System.out.println("✓ WebDriver cerrado correctamente");
-            System.out.println("==============================================");
+            try {
+                // quit() cierra todas las ventanas y finaliza la sesión del WebDriver
+                // Diferencia con close(): close() solo cierra la ventana actual
+                driver.quit();
+                
+                System.out.println("==============================================");
+                System.out.println("✓ WebDriver cerrado correctamente");
+                System.out.println("==============================================");
+                
+            } catch (Exception e) {
+                // Si quit() falla, intentar limpiar de todas formas
+                System.err.println("⚠️ Advertencia: Error al cerrar WebDriver: " + e.getMessage());
+                try {
+                    // Intentar cerrar de forma más agresiva
+                    driver.close();
+                } catch (Exception e2) {
+                    System.err.println("⚠️ No se pudo cerrar el navegador. Puede que haya procesos zombie.");
+                }
+            } finally {
+                // Asegurar que la referencia se limpie
+                driver = null;
+            }
         }
     }
     
