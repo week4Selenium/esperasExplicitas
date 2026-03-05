@@ -182,6 +182,62 @@ gradle test --tests "tests.DemoWithExplicitWaitTest.testAsyncContentWithWait"
 gradle test --tests "tests.DemoWithoutWaitTest.testAsyncContentWithoutWait"
 ```
 
+## ⏱️ Configuración de Velocidad de Demostración
+
+### 🎥 Para Presentaciones y Demos en Vivo
+
+Por defecto, los tests incluyen **pausas de demostración** de 1.5 segundos entre cada acción para que la automatización sea **visible y fácil de seguir** durante presentaciones a clientes o capacitaciones.
+
+**Velocidad actual**: 1500 ms (1.5 segundos) por acción
+
+### 📝 Ajustar la Velocidad
+
+Para cambiar la velocidad de demostración, edita el archivo `BaseTest.java`:
+
+```java
+// En src/test/java/base/BaseTest.java, línea ~37
+
+// ⏱️ DELAY PARA DEMOSTRACIONES
+// Ajusta este valor según tus necesidades:
+protected static final int DEMO_DELAY = 1500;  // ← Cambia este número
+
+// Ejemplos de configuración:
+// - Para presentaciones lentas: 2500 ms (2.5 segundos)
+// - Para demos normales: 1500 ms (1.5 segundos - actual)
+// - Para ejecución rápida: 500 ms (0.5 segundos)
+// - Para CI/CD sin pausas: 0 ms (sin pausas)
+```
+
+### 🚀 Deshabilitar Pausas para CI/CD
+
+Si ejecutas los tests en pipelines automatizados, puedes:
+
+**Opción 1**: Configurar `DEMO_DELAY = 0` en BaseTest.java
+
+**Opción 2**: Comentar las llamadas a `pauseForDemo()` en los tests
+
+```java
+// pauseForDemo(); // ← Comentar esta línea
+```
+
+### 📊 Tiempo de Ejecución Estimado
+
+Con las pausas actuales (1500 ms):
+
+| Test Suite | Tests | Tiempo Aprox. |
+|------------|-------|---------------|
+| DemoWithExplicitWaitTest | 5 tests | ~45-60 segundos |
+| DemoWithoutWaitTest | 4 tests | ~30-40 segundos |
+| Todos los tests | 9 tests | ~75-100 segundos |
+
+Sin pausas (DEMO_DELAY = 0):
+
+| Test Suite | Tests | Tiempo Aprox. |
+|------------|-------|---------------|
+| DemoWithExplicitWaitTest | 5 tests | ~20-25 segundos |
+| DemoWithoutWaitTest | 4 tests | ~10-15 segundos |
+| Todos los tests | 9 tests | ~30-40 segundos |
+
 ## 📊 Resultados Esperados
 
 ### ✅ Tests con Esperas Explícitas
