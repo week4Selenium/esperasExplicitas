@@ -29,10 +29,10 @@ Demostrar de manera práctica y profesional:
 El proyecto está diseñado para que **algunos tests pasen** y **otros fallen intencionalmente**:
 
 ```
-✅ 5 tests PASAN  → DemoWithExplicitWaitTest (CON esperas)
+✅ 4 tests PASAN  → DemoWithExplicitWaitTest (CON esperas)
 ❌ 4 tests FALLAN → DemoWithoutWaitTest (SIN esperas)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   9 tests TOTAL
+   8 tests TOTAL
 ```
 
 ### 📊 Ver el Reporte HTML
@@ -73,17 +73,17 @@ El reporte HTML mostrará:
 A: **ES INTENCIONAL**. Los tests en `DemoWithoutWaitTest` están diseñados para fallar y mostrar problemas reales de sincronización.
 
 **Q: ¿Los tests se ejecutan dos veces?**  
-A: **NO**. Hay 9 tests individuales (5 en una clase, 4 en otra) que se ejecutan UNA sola vez cada uno.
+A: **NO**. Hay 8 tests individuales (4 en cada clase) que se ejecutan UNA sola vez cada uno.
 
 **Q: ¿Qué tests deberían pasar?**  
-A: Solo los 5 tests de `DemoWithExplicitWaitTest` (que usan esperas explícitas correctamente).
+A: Solo los 4 tests de `DemoWithExplicitWaitTest` (que usan esperas explícitas correctamente).
 
 **Q: ¿Cómo verifico que todo funciona bien?**  
 A: Ejecuta:
 ```bash
 .\gradlew.bat test 2>&1 | Select-String "tests completed"
 ```
-Deberías ver: `9 tests completed, 4 failed` ✅
+Deberías ver: `8 tests completed, 4 failed` ✅
 
 📄 Para más detalles, lee: [VERIFICAR_COMPORTAMIENTO.md](VERIFICAR_COMPORTAMIENTO.md)
 
@@ -295,44 +295,134 @@ Con las pausas actuales (1500 ms):
 
 | Test Suite | Tests | Tiempo Aprox. |
 |------------|-------|---------------|
-| DemoWithExplicitWaitTest | 5 tests | ~45-60 segundos |
+| DemoWithExplicitWaitTest | 4 tests | ~35-50 segundos |
 | DemoWithoutWaitTest | 4 tests | ~30-40 segundos |
-| Todos los tests | 9 tests | ~75-100 segundos |
+| Todos los tests | 8 tests | ~65-90 segundos |
 
 Sin pausas (DEMO_DELAY = 0):
 
 | Test Suite | Tests | Tiempo Aprox. |
 |------------|-------|---------------|
-| DemoWithExplicitWaitTest | 5 tests | ~20-25 segundos |
+| DemoWithExplicitWaitTest | 4 tests | ~15-20 segundos |
 | DemoWithoutWaitTest | 4 tests | ~10-15 segundos |
-| Todos los tests | 9 tests | ~30-40 segundos |
+| Todos los tests | 8 tests | ~25-35 segundos |
 
-## 📊 Resultados Esperados
+## �️ Solución de Problemas
+
+### ⚠️ Problema: Chrome no abre en la segunda ejecución
+
+**Síntoma**: Después de ejecutar los tests una vez, Chrome no se abre correctamente en ejecuciones subsecuentes.
+
+**Causa**: Procesos de Chrome y ChromeDriver quedan abiertos después de finalizar los tests, creando conflictos para nuevas sesiones.
+
+**Solución Rápida**: Usa el script de limpieza incluido
+
+#### En Windows (PowerShell o CMD)
+
+```bash
+# Opción 1: Script automático (recomendado)
+.\LIMPIAR_CHROME.bat
+
+# Opción 2: Comando manual
+taskkill /F /IM chrome.exe /T
+taskkill /F /IM chromedriver.exe /T
+```
+
+#### En Linux/Mac
+
+```bash
+# Comando manual
+pkill -9 chrome
+pkill -9 chromedriver
+```
+
+### 📝 Script LIMPIAR_CHROME.bat
+
+El proyecto incluye un script que:
+
+- ✅ Cierra TODOS los procesos de Chrome
+- ✅ Cierra TODOS los procesos de ChromeDriver
+- ✅ Verifica que el sistema esté limpio
+- ✅ Muestra confirmación de limpieza
+
+**Uso**:
+
+1. **Doble clic** en el archivo `LIMPIAR_CHROME.bat`
+2. **O ejecuta desde terminal**: `.\LIMPIAR_CHROME.bat`
+3. **Luego ejecuta los tests normalmente**: `.\gradlew.bat test`
+
+### 🔍 Verificar procesos activos
+
+```bash
+# Windows PowerShell
+Get-Process chrome*,chromedriver* -ErrorAction SilentlyContinue
+
+# Comando CMD
+tasklist | findstr chrome
+
+# Linux/Mac
+ps aux | grep chrome
+```
+
+### 🚨 Otros problemas comunes
+
+#### Tests muy rápidos en demostraciones
+
+Ajusta `DEMO_DELAY` en [BaseTest.java](src/test/java/base/BaseTest.java) (ver sección "Configuración de Velocidad").
+
+#### Limpieza de caché de Gradle
+
+```bash
+# Detiene el daemon de Gradle y limpia el proyecto
+.\gradlew.bat clean --stop
+
+# O usa la tarea personalizada
+.\gradlew.bat info
+```
+
+#### Error "Unable to find CDP implementation"
+
+Este warning es **NORMAL** y no afecta la ejecución. Selenium funciona correctamente sin CDP para este proyecto.
+
+---
+
+## �📊 Resultados Esperados
 
 ### ✅ Tests con Esperas Explícitas
 
 ```
 DemoWithExplicitWaitTest
-  ✓ testAsyncContentWithWait()              PASSED
-  ✓ testClickableElementWithWait()          PASSED
-  ✓ testDynamicTextWithWait()              PASSED
-  ✓ testOverlayWithWait()                  PASSED
-  ✓ testCompleteFlowWithExplicitWaits()    PASSED
+  ✓ test1_AsyncContentWorks()       PASSED
+  ✓ test2_DisabledButtonWorks()     PASSED
+  ✓ test3_DynamicTextWorks()        PASSED
+  ✓ test4_OverlayBlocksWorks()      PASSED
 
-Total: 5 tests, 5 passed ✅
+Total: 4 tests, 4 passed ✅
 ```
 
 ### ❌ Tests sin Esperas (Fallidos por Diseño)
 
 ```
 DemoWithoutWaitTest
-  ✗ testAsyncContentWithoutWait()          FAILED (NoSuchElementException)
-  ✗ testClickableElementWithoutWait()      FAILED (ElementNotInteractableException)
-  ✗ testDynamicTextWithoutWait()          FAILED (Assertion failed)
-  ✗ testOverlayWithoutWait()              FAILED (ElementClickInterceptedException)
+  ✗ test1_AsyncContentFails()       FAILED (NoSuchElementException)
+  ✗ test2_DisabledButtonFails()     FAILED (ElementNotInteractableException)
+  ✗ test3_DynamicTextFails()        FAILED (AssertionFailedError)
+  ✗ test4_OverlayBlocksFails()      FAILED (ElementNotInteractableException)
 
 Total: 4 tests, 0 passed, 4 failed ❌
 ```
+
+### 📊 Resumen Total
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ TOTAL:  8 tests
+ PASSED: 4 tests (50%) ✅
+ FAILED: 4 tests (50%) ❌
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**NOTA**: Los 4 tests fallidos son **intencionales** y demuestran problemas reales de sincronización.
 
 ## 📚 Conceptos Clave
 
@@ -424,11 +514,11 @@ Modifica:
 
 El proyecto demuestra:
 - ❌ **SIN esperas** → Tests FALLAN (4 tests en `DemoWithoutWaitTest`)
-- ✅ **CON esperas** → Tests PASAN (5 tests en `DemoWithExplicitWaitTest`)
+- ✅ **CON esperas** → Tests PASAN (4 tests en `DemoWithExplicitWaitTest`)
 
 **Resultado esperado al ejecutar todos los tests:**
 ```
-9 tests completed, 4 failed
+8 tests completed, 4 failed
 BUILD FAILED
 ```
 
@@ -443,13 +533,13 @@ Verificación:
 .\gradlew.bat clean test 2>&1 | Select-String "tests completed"
 ```
 
-Resultado esperado: `9 tests completed, 4 failed`
+Resultado esperado: `8 tests completed, 4 failed`
 
-**Explicación**: Hay 9 tests en total:
-- 5 tests en `DemoWithExplicitWaitTest` (nombres: testAsyncContentWithWait, testClickableElementWithWait, etc.)
-- 4 tests en `DemoWithoutWaitTest` (nombres similares pero sin esperas)
+**Explicación**: Hay 8 tests en total:
+- 4 tests en `DemoWithExplicitWaitTest` (test1_AsyncContentWorks, test2_DisabledButtonWorks, test3_DynamicTextWorks, test4_OverlayBlocksWorks)
+- 4 tests en `DemoWithoutWaitTest` (test1_AsyncContentFails, test2_DisabledButtonFails, test3_DynamicTextFails, test4_OverlayBlocksFails)
 
-Pueden parecer duplicados por los nombres similares, pero son **tests diferentes** en **clases diferentes**.
+Cada test se ejecuta UNA sola vez, pero hay **4 escenarios diferentes** demostrados con y sin esperas.
 
 ### ❓ "¿Cómo veo el reporte HTML?"
 
@@ -470,7 +560,7 @@ start build\reports\tests\test\index.html
 Navega a la carpeta `build/reports/tests/test/` y abre `index.html`
 
 **Contenido del reporte:**
-- 📊 Resumen general: 9 tests, 5 passed, 4 failed
+- 📊 Resumen general: 8 tests, 4 passed, 4 failed
 - 📁 Tests por paquete y clase
 - 🔍 Detalles de cada test (stack trace de errores, duración, output)
 - 📈 Gráficos de éxito/fallo
@@ -547,7 +637,7 @@ Ejecuta estos comandos en orden para verificar que todo funciona:
 
 # 3. Verificar el conteo
 .\gradlew.bat test 2>&1 | Select-String "tests completed"
-# Debe mostrar: "9 tests completed, 4 failed"
+# Debe mostrar: "8 tests completed, 4 failed"
 
 # 4. Abrir reporte HTML
 start build\reports\tests\test\index.html

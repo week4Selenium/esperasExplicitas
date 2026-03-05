@@ -44,13 +44,13 @@ C:\Users\alejandra.marin\Documents\TRAINING\EsperasExplicitas\build\reports\test
 
 ### ✅ Comportamiento ESPERADO y CORRECTO
 
-El proyecto tiene **9 tests en total**, divididos en 2 categorías:
+El proyecto tiene **8 tests en total**, divididos en 2 categorías:
 
 | Clase de Test | Cantidad | Resultado Esperado | ¿Está Correcto? |
 |--------------|----------|-------------------|-----------------|
-| `DemoWithExplicitWaitTest` | 5 | ✅ **PASAN** | ✅ SÍ |
+| `DemoWithExplicitWaitTest` | 4 | ✅ **PASAN** | ✅ SÍ |
 | `DemoWithoutWaitTest` | 4 | ❌ **FALLAN** | ✅ SÍ |
-| **TOTAL** | **9** | **5 PASAN, 4 FALLAN** | ✅ **CORRECTO** |
+| **TOTAL** | **8** | **4 PASAN, 4 FALLAN** | ✅ **CORRECTO** |
 
 ### 📌 ¿Por Qué los Tests "Malos" Deben Fallar?
 
@@ -85,23 +85,22 @@ CON Esperas Explícitas → ✅ PASAN (5 tests)
 
 **FALSO** - No hay duplicación.
 
-### ✅ REALIDAD: Hay 9 tests individuales
+### ✅ REALIDAD: Hay 8 tests individuales
 
 ```bash
 # Al ejecutar: .\gradlew.bat test
 
 # Se ejecutan UNA SOLA VEZ:
-✅ testAsyncContentWithWait()
-✅ testOverlayWithWait()
-✅ testDynamicTextWithWait()
-✅ testClickableElementWithWait()
-✅ testCompleteFlowWithExplicitWaits()
-❌ testAsyncContentWithoutWait()
-❌ testDynamicTextWithoutWait()
-❌ testClickableElementWithoutWait()
-❌ testOverlayWithoutWait()
+✅ test1_AsyncContentWorks()
+✅ test2_DisabledButtonWorks()
+✅ test3_DynamicTextWorks()
+✅ test4_OverlayBlocksWorks()
+❌ test1_AsyncContentFails()
+❌ test2_DisabledButtonFails()
+❌ test3_DynamicTextFails()
+❌ test4_OverlayBlocksFails()
 
-Total: 9 tests (5 pasan, 4 fallan)
+Total: 8 tests (4 pasan, 4 fallan)
 ```
 
 ### 🔍 Verificación Manual
@@ -113,7 +112,7 @@ Total: 9 tests (5 pasan, 4 fallan)
 
 **Resultado esperado:**
 ```
-9 tests completed, 4 failed
+8 tests completed, 4 failed
 ```
 
 ### 🤔 ¿Por Qué Puede Verse "Duplicado"?
@@ -144,7 +143,7 @@ Pero cada test **se ejecuta UNA SOLA VEZ**.
 ```powershell
 .\gradlew.bat test
 ```
-**Resultado esperado:** `9 tests completed, 4 failed` (5✅ + 4❌)
+**Resultado esperado:** `8 tests completed, 4 failed` (4✅ + 4❌)
 
 ### Limpiar y ejecutar desde cero:
 ```powershell
@@ -158,17 +157,17 @@ Pero cada test **se ejecuta UNA SOLA VEZ**.
 El reporte HTML muestra:
 
 ### 📊 Vista General (index.html)
-- Total de tests: 9
-- Tests exitosos: 5 (verde)
+- Total de tests: 8
+- Tests exitosos: 4 (verde)
 - Tests fallidos: 4 (rojo)
 - Duración total
-- Porcentaje de éxito: ~56%
+- Porcentaje de éxito: 50%
 
 ### 📁 Por Paquete (packages)
 - `tests` → 2 clases
 
 ### 📝 Por Clase (classes)
-- `DemoWithExplicitWaitTest` → 5 tests ✅
+- `DemoWithExplicitWaitTest` → 4 tests ✅
 - `DemoWithoutWaitTest` → 4 tests ❌
 
 ### 🔍 Detalle por Test
@@ -208,7 +207,7 @@ test {
 
 1. ✅ **Reporte HTML**: Se genera en `build/reports/tests/test/index.html`
 2. ✅ **Tests "malos"**: SÍ fallan (es el comportamiento esperado)
-3. ✅ **No hay duplicación**: 9 tests se ejecutan UNA sola vez
+3. ✅ **No hay duplicación**: 8 tests se ejecutan UNA sola vez
 4. ✅ **Configuración**: Gradle está bien configurado
 
 ### El proyecto cumple su propósito educativo:
