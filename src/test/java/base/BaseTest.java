@@ -34,6 +34,12 @@ public class BaseTest {
     // Se calcula dinámicamente para que funcione en cualquier máquina
     protected String pageUrl;
     
+    // ⏱️ DELAY PARA DEMOSTRACIONES
+    // Tiempo de pausa (en milisegundos) después de cada acción
+    // para que las personas puedan ver la automatización en pantalla
+    // 1500ms = 1.5 segundos por acción (ajusta según necesidad)
+    protected static final int DEMO_DELAY = 1500;
+    
     /**
      * Método que se ejecuta ANTES de cada test
      * Anotación @BeforeEach de JUnit 5 indica que este método se ejecuta antes de cada @Test
@@ -148,5 +154,43 @@ public class BaseTest {
     protected void openTestPage() {
         driver.get(pageUrl);
         System.out.println("→ Página de prueba cargada: " + driver.getTitle());
+    }
+    
+    /**
+     * Pausa para demostración
+     * 
+     * PROPÓSITO DE ESTE MÉTODO:
+     * Durante demostraciones en vivo o presentaciones a clientes,
+     * hace que la automatización sea más lenta y VISIBLE para que
+     * las personas puedan seguir cada paso de la ejecución.
+     * 
+     * CUÁNDO USAR:
+     * - Presentaciones a clientes o stakeholders
+     * - Videos de capacitación
+     * - Demostraciones en vivo
+     * 
+     * CUÁNDO NO USAR:
+     * - Ejecución en pipelines de CI/CD (comentar las llamadas)
+     * - Pruebas de rendimiento
+     * - Ejecución masiva de tests
+     * 
+     * @param milliseconds - tiempo de pausa en milisegundos (1000ms = 1 segundo)
+     */
+    protected void pauseForDemo(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            // Si se interrumpe el sleep, restaurar el estado de interrupción
+            Thread.currentThread().interrupt();
+            System.out.println("⚠️ Pausa de demostración interrumpida");
+        }
+    }
+    
+    /**
+     * Pausa para demostración usando el delay por defecto
+     * Usa la constante DEMO_DELAY definida en la clase
+     */
+    protected void pauseForDemo() {
+        pauseForDemo(DEMO_DELAY);
     }
 }
