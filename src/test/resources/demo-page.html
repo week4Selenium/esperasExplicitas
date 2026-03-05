@@ -19,7 +19,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f57e1d 0%, #d8861b 100%);
             padding: 20px;
             min-height: 100vh;
         }
@@ -49,14 +49,14 @@
         }
 
         h2 {
-            color: #667eea;
+            color: #f18b05;
             margin-bottom: 20px;
             font-size: 20px;
         }
 
         /* Estilo para botones */
         button {
-            background: #667eea;
+            background: #e79213;
             color: white;
             border: none;
             padding: 12px 30px;
@@ -69,7 +69,7 @@
         }
 
         button:hover {
-            background: #764ba2;
+            background: #d19130;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
@@ -184,37 +184,37 @@
 <body>
     <div class="container">
         <h1>🚀 Demo: Esperas Explícitas con Selenium</h1>
-        
+
         <!-- 
-            SECCIÓN 1: Botón con respuesta demorada
-            Simula una llamada API que tarda 3 segundos
-            SIN esperas explícitas: El test intentará hacer click antes de que aparezca
+            SECCIÓN 1: Elemento que se hace clickeable después de un tiempo
+            Simula un botón deshabilitado que se habilita después de validación
         -->
         <div class="section">
-            <h2>📡 Escenario 1: Elemento que Aparece Después de Carga Asíncrona</h2>
-            <button id="btnLoadContent" onclick="loadAsyncContent()">Cargar Contenido Remoto</button>
+            <h2>⏱️ Escenario 1: Elemento que se Vuelve Clickeable</h2>
+            <input type="text" id="username" placeholder="Ingrese nombre de usuario" 
+                   oninput="validateForm()">
             
-            <!-- Este div permanece oculto hasta que se complete la "carga" -->
-            <div id="loadingIndicator" class="hidden">
-                <div class="loader"></div>
-                <p style="text-align: center; color: #666;">Cargando datos del servidor...</p>
-            </div>
+            <!-- Botón inicialmente deshabilitado -->
+            <button id="btnSubmit" disabled onclick="submitForm()">
+                Enviar Formulario
+            </button>
             
-            <!-- Este botón aparece después de 3 segundos -->
-            <div id="asyncContent" class="hidden"></div>
+            <div id="submitResult" class="hidden"></div>
             
             <div class="note">
-                <strong>⚠️ Problema sin esperas:</strong> El test buscará el botón "Procesar Datos" 
-                inmediatamente, pero este no existe aún. Resultado: NoSuchElementException
+                <strong>⚠️ Problema sin esperas:</strong> El test intentará hacer click en un botón 
+                deshabilitado. Resultado: ElementNotInteractableException
             </div>
         </div>
+        
+       
 
                <!-- 
-            SECCIÓN 4: Elemento que desaparece (Visibility Toggle)
+            SECCIÓN 2: Elemento que desaparece (Visibility Toggle)
             Útil para modales, mensajes temporales, overlays
         -->
         <div class="section">
-            <h2>👁️ Escenario 4: Elemento que Desaparece</h2>
+            <h2>👁️ Escenario 2: Elemento que Desaparece</h2>
             <button id="btnShowAlert" onclick="showTemporaryAlert()">Mostrar Alerta Temporal</button>
             
             <div id="temporaryAlert" class="hidden"></div>
@@ -251,25 +251,27 @@
             </div>
         </div>
 
-  <!-- 
-            SECCIÓN 2: Elemento que se hace clickeable después de un tiempo
-            Simula un botón deshabilitado que se habilita después de validación
+   <!-- 
+            SECCIÓN 4: Botón con respuesta demorada
+            Simula una llamada API que tarda 3 segundos
+            SIN esperas explícitas: El test intentará hacer click antes de que aparezca
         -->
         <div class="section">
-            <h2>⏱️ Escenario 2: Elemento que se Vuelve Clickeable</h2>
-            <input type="text" id="username" placeholder="Ingrese nombre de usuario" 
-                   oninput="validateForm()">
+            <h2>📡 Escenario 4: Elemento que Aparece Después de Carga Asíncrona</h2>
+            <button id="btnLoadContent" onclick="loadAsyncContent()">Cargar Contenido Remoto</button>
             
-            <!-- Botón inicialmente deshabilitado -->
-            <button id="btnSubmit" disabled onclick="submitForm()">
-                Enviar Formulario
-            </button>
+            <!-- Este div permanece oculto hasta que se complete la "carga" -->
+            <div id="loadingIndicator" class="hidden">
+                <div class="loader"></div>
+                <p style="text-align: center; color: #666;">Cargando datos del servidor...</p>
+            </div>
             
-            <div id="submitResult" class="hidden"></div>
+            <!-- Este botón aparece después de 3 segundos -->
+            <div id="asyncContent" class="hidden"></div>
             
             <div class="note">
-                <strong>⚠️ Problema sin esperas:</strong> El test intentará hacer click en un botón 
-                deshabilitado. Resultado: ElementNotInteractableException
+                <strong>⚠️ Problema sin esperas:</strong> El test buscará el botón "Procesar Datos" 
+                inmediatamente, pero este no existe aún. Resultado: NoSuchElementException
             </div>
         </div>
 

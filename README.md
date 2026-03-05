@@ -198,6 +198,7 @@ El proyecto incluye 4 escenarios reales de aplicaciones web modernas:
 ```bash
 git clone https://github.com/week4Selenium/esperasExplicitas.git
 cd esperasExplicitas
+rama master
 ```
 
 2. **Verificar la instalación de Java**:
@@ -226,29 +227,29 @@ gradlew.bat build # Windows
 ### Ejecutar TODOS los tests
 
 ```bash
-gradle test
+.\gradlew.bat test
 ```
 
 ### Ejecutar solo los tests CON esperas explícitas (que pasan)
 
 ```bash
-gradle test --tests "tests.DemoWithExplicitWaitTest"
+.\gradlew.bat test --tests "tests.DemoWithExplicitWaitTest"
 ```
 
 ### Ejecutar solo los tests SIN esperas (que fallan intencionalmente)
 
 ```bash
-gradle test --tests "tests.DemoWithoutWaitTest"
+.\gradlew.bat test --tests "tests.DemoWithoutWaitTest"
 ```
 
 ### Ejecutar un test específico
 
 ```bash
 # Test de carga asíncrona CON esperas
-gradle test --tests "tests.DemoWithExplicitWaitTest.testAsyncContentWithWait"
+.\gradlew.bat test --tests "tests.DemoWithExplicitWaitTest.testAsyncContentWithWait"
 
 # Test de carga asíncrona SIN esperas (fallará)
-gradle test --tests "tests.DemoWithoutWaitTest.testAsyncContentWithoutWait"
+.\gradlew.bat test --tests "tests.DemoWithoutWaitTest.testAsyncContentWithoutWait"
 ```
 
 ## ⏱️ Configuración de Velocidad de Demostración
