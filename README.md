@@ -20,6 +20,75 @@ Demostrar de manera práctica y profesional:
 3. **Cómo resolver** estos problemas con `WebDriverWait` + `ExpectedConditions`
 4. **Buenas prácticas** de automatización profesional
 
+---
+
+## 📊 IMPORTANTE: Comportamiento Esperado de los Tests
+
+### ✅ ¿Qué Resultados Son Correctos?
+
+El proyecto está diseñado para que **algunos tests pasen** y **otros fallen intencionalmente**:
+
+```
+✅ 5 tests PASAN  → DemoWithExplicitWaitTest (CON esperas)
+❌ 4 tests FALLAN → DemoWithoutWaitTest (SIN esperas)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   9 tests TOTAL
+```
+
+### 📊 Ver el Reporte HTML
+
+Después de ejecutar los tests, abre el reporte HTML:
+
+**Método 1: Script Automático (Recomendado)**
+```bash
+# Doble clic en el archivo:
+ABRIR_REPORTE.bat
+```
+
+**Método 2: Comando Manual**
+```bash
+start build\reports\tests\test\index.html
+```
+
+**Método 3: Ruta Completa**
+```
+build/reports/tests/test/index.html
+```
+
+### 🎯 Interpretación del Reporte
+
+El reporte HTML mostrará:
+
+| Métrica | Valor Esperado | ¿Es Correcto? |
+|---------|----------------|---------------|
+| **Total Tests** | 9 | ✅ Sí |
+| **Tests Passed** | 5 (56%) | ✅ Sí |
+| **Tests Failed** | 4 (44%) | ✅ Sí |
+
+**IMPORTANTE**: Los 4 tests fallidos son **intencionales** para demostrar los problemas sin esperas explícitas.
+
+### ❓ Preguntas Frecuentes
+
+**Q: ¿Por qué fallan algunos tests?**  
+A: **ES INTENCIONAL**. Los tests en `DemoWithoutWaitTest` están diseñados para fallar y mostrar problemas reales de sincronización.
+
+**Q: ¿Los tests se ejecutan dos veces?**  
+A: **NO**. Hay 9 tests individuales (5 en una clase, 4 en otra) que se ejecutan UNA sola vez cada uno.
+
+**Q: ¿Qué tests deberían pasar?**  
+A: Solo los 5 tests de `DemoWithExplicitWaitTest` (que usan esperas explícitas correctamente).
+
+**Q: ¿Cómo verifico que todo funciona bien?**  
+A: Ejecuta:
+```bash
+.\gradlew.bat test 2>&1 | Select-String "tests completed"
+```
+Deberías ver: `9 tests completed, 4 failed` ✅
+
+📄 Para más detalles, lee: [VERIFICAR_COMPORTAMIENTO.md](VERIFICAR_COMPORTAMIENTO.md)
+
+---
+
 ## 🏗️ Arquitectura del Proyecto
 
 El proyecto sigue el patrón **Page Object Model (POM)** y estructura profesional:
@@ -349,11 +418,89 @@ Modifica:
 
 ## 🐛 Solución de Problemas
 
+### ❓ "¿Por qué algunos tests fallan? ¿No deberían todos pasar?"
+
+**Respuesta**: **NO**. Este es el comportamiento ESPERADO y CORRECTO.
+
+El proyecto demuestra:
+- ❌ **SIN esperas** → Tests FALLAN (4 tests en `DemoWithoutWaitTest`)
+- ✅ **CON esperas** → Tests PASAN (5 tests en `DemoWithExplicitWaitTest`)
+
+**Resultado esperado al ejecutar todos los tests:**
+```
+9 tests completed, 4 failed
+BUILD FAILED
+```
+
+**Esto es CORRECTO** ✅ - Los 4 tests que fallan demuestran el problema que las esperas explícitas resuelven.
+
+### ❓ "Los tests se ejecutan dos veces"
+
+**Respuesta**: **NO se ejecutan dos veces**.
+
+Verificación:
+```bash
+.\gradlew.bat clean test 2>&1 | Select-String "tests completed"
+```
+
+Resultado esperado: `9 tests completed, 4 failed`
+
+**Explicación**: Hay 9 tests en total:
+- 5 tests en `DemoWithExplicitWaitTest` (nombres: testAsyncContentWithWait, testClickableElementWithWait, etc.)
+- 4 tests en `DemoWithoutWaitTest` (nombres similares pero sin esperas)
+
+Pueden parecer duplicados por los nombres similares, pero son **tests diferentes** en **clases diferentes**.
+
+### ❓ "¿Cómo veo el reporte HTML?"
+
+**Respuesta**: El reporte se genera en: `build/reports/tests/test/index.html`
+
+**Opción 1 - Script Automático:**
+```bash
+# Doble clic en:
+ABRIR_REPORTE.bat
+```
+
+**Opción 2 - Comando:**
+```bash
+start build\reports\tests\test\index.html
+```
+
+**Opción 3 - Manual:**
+Navega a la carpeta `build/reports/tests/test/` y abre `index.html`
+
+**Contenido del reporte:**
+- 📊 Resumen general: 9 tests, 5 passed, 4 failed
+- 📁 Tests por paquete y clase
+- 🔍 Detalles de cada test (stack trace de errores, duración, output)
+- 📈 Gráficos de éxito/fallo
+
+### ❓ "Los tests sin esperas ahora pasan (pero deberían fallar)"
+
+**Diagnóstico**: Verifica que el HTML tenga los delays correctos.
+
+**Verificación**:
+```bash
+# Solo ejecutar tests sin esperas:
+.\gradlew.bat test --tests "tests.DemoWithoutWaitTest"
+```
+
+**Resultado esperado**: `4 tests completed, 4 failed`
+
+Si pasan, revisa el archivo `demo-page.html` - los delays de JavaScript deben ser:
+- Escenario 1: 3000ms (3 segundos)
+- Escenario 2: 2000ms (2 segundos)  
+- Escenario 3: 2000ms + 2000ms (4 segundos total)
+- Escenario 4: 3000ms (3 segundos)
+
 ### El navegador no se abre
 
 **Problema**: WebDriverManager no puede descargar el driver
 
-**Solución**: Verifica tu conexión a internet y proxy
+**Solución**: 
+1. Verifica tu conexión a internet
+2. Verifica configuración de proxy
+3. Actualiza Chrome a la última versión
 
 ### Tests fallan con TimeoutException
 
@@ -361,7 +508,10 @@ Modifica:
 
 **Solución**: 
 1. Verifica que el HTML esté cargado correctamente
-2. Aumenta el timeout en `BasePage.java`
+2. Aumenta el timeout en `BasePage.java` (línea ~32):
+   ```java
+   private static final int TIMEOUT_SECONDS = 10; // Aumentar a 15 o 20
+   ```
 3. Revisa que los localizadores sean correctos
 
 ### No se encuentra el archivo HTML
@@ -369,6 +519,53 @@ Modifica:
 **Problema**: La ruta al archivo `demo-page.html` es incorrecta
 
 **Solución**: Verifica que el archivo esté en `src/test/resources/demo-page.html`
+
+### Comando "gradlew not found"
+
+**Problema**: El wrapper de Gradle no tiene permisos de ejecución
+
+**Solución**:
+```bash
+# Windows:
+.\gradlew.bat test
+
+# Linux/Mac:
+chmod +x gradlew
+./gradlew test
+```
+
+### 🔍 Verificación Completa del Proyecto
+
+Ejecuta estos comandos en orden para verificar que todo funciona:
+
+```powershell
+# 1. Limpiar build anterior
+.\gradlew.bat clean
+
+# 2. Ejecutar todos los tests
+.\gradlew.bat test
+
+# 3. Verificar el conteo
+.\gradlew.bat test 2>&1 | Select-String "tests completed"
+# Debe mostrar: "9 tests completed, 4 failed"
+
+# 4. Abrir reporte HTML
+start build\reports\tests\test\index.html
+
+# 5. Verificar tests buenos (deben pasar)
+.\gradlew.bat test --tests "tests.DemoWithExplicitWaitTest"
+# Debe mostrar: "5 tests completed, 0 failed" + BUILD SUCCESSFUL
+
+# 6. Verificar tests malos (deben fallar)
+.\gradlew.bat test --tests "tests.DemoWithoutWaitTest"
+# Debe mostrar: "4 tests completed, 4 failed" + BUILD FAILED
+```
+
+Si todos estos comandos producen los resultados esperados, **el proyecto está funcionando perfectamente** ✅
+
+📄 **Documentación adicional:**
+- [VERIFICAR_COMPORTAMIENTO.md](VERIFICAR_COMPORTAMIENTO.md) - Guía detallada de verificación
+- [ABRIR_REPORTE.bat](ABRIR_REPORTE.bat) - Script para abrir el reporte HTML
 
 ## 👥 Autor
 
