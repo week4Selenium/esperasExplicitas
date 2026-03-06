@@ -10,10 +10,7 @@ public class DemoWithExplicitWaitTest extends BaseTest {
     
     @Test
     public void test1_AsyncContentWorks() {
-        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║  ✅ Test 1: Carga Asíncrona CON esperas                   ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════╝");
-        
+     
         DemoPage page = new DemoPage(driver);
         page.navigateTo(pageUrl);
         pauseForDemo();
@@ -35,10 +32,7 @@ public class DemoWithExplicitWaitTest extends BaseTest {
     
     @Test
     public void test2_DisabledButtonWorks() {
-        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║  ✅ Test 2: Botón Deshabilitado CON esperas               ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════╝");
-        
+      
         DemoPage page = new DemoPage(driver);
         page.navigateTo(pageUrl);
         pauseForDemo();
@@ -57,9 +51,6 @@ public class DemoWithExplicitWaitTest extends BaseTest {
     
     @Test
     public void test3_DynamicTextWorks() {
-        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║  ✅ Test 3: Texto Dinámico CON esperas                    ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════╝");
         
         DemoPage page = new DemoPage(driver);
         page.navigateTo(pageUrl);
@@ -85,9 +76,6 @@ public class DemoWithExplicitWaitTest extends BaseTest {
     
     @Test
     public void test4_OverlayBlocksWorks() {
-        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║  ✅ Test 4: Overlay Bloqueante CON esperas                ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════╝");
         
         DemoPage page = new DemoPage(driver);
         page.navigateTo(pageUrl);
