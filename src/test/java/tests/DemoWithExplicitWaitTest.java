@@ -1,4 +1,4 @@
-﻿package tests;
+package tests;
 
 import base.BaseTest;
 import pages.DemoPage;
