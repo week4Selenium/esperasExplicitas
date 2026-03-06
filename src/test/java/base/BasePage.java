@@ -1,4 +1,4 @@
-package base;
+﻿package base;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -18,39 +18,32 @@ public class BasePage {
     }
     
     protected WebElement waitForElementToBeVisible(By locator) {
-        System.out.println("  → Esperando que sea visible: " + locator);
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
     
     protected WebElement waitForElementToBeClickable(By locator) {
-        System.out.println("  → Esperando que sea clickeable: " + locator);
         return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
     
     protected boolean waitForTextToBePresentInElement(By locator, String expectedText) {
-        System.out.println("  → Esperando texto '" + expectedText + "' en: " + locator);
         return wait.until(ExpectedConditions.textToBePresentInElementLocated(locator, expectedText));
     }
     
     protected boolean waitForElementToBeInvisible(By locator) {
-        System.out.println("  → Esperando que desaparezca: " + locator);
         return wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
     }
     
     protected void clickElement(By locator) {
-        System.out.println("→ Click en: " + locator);
         waitForElementToBeClickable(locator).click();
     }
     
     protected void typeText(By locator, String text) {
-        System.out.println("→ Escribiendo '" + text + "' en: " + locator);
         WebElement element = waitForElementToBeVisible(locator);
         element.clear(); 
         element.sendKeys(text);
     }
     
     protected String getText(By locator) {
-        System.out.println("→ Obteniendo texto de: " + locator);
         return waitForElementToBeVisible(locator).getText();
     }
     

@@ -1,4 +1,4 @@
-package base;
+﻿package base;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterEach;
@@ -40,14 +40,8 @@ public class BaseTest {
             File htmlFile = new File("src/test/resources/demo-page.html");
             pageUrl = "file:///" + htmlFile.getAbsolutePath().replace("\\", "/");
             
-            System.out.println("==============================================");
-            System.out.println("✓ WebDriver inicializado correctamente");
-            System.out.println("✓ Navegador: Chrome");
-            System.out.println("✓ URL de la página: " + pageUrl);
-            System.out.println("==============================================");
-            
         } catch (Exception e) {
-            System.err.println("❌ Error en setUp: " + e.getMessage());
+            System.err.println("âŒ Error en setUp: " + e.getMessage());
             e.printStackTrace();
             throw e;
         }
@@ -60,7 +54,7 @@ public class BaseTest {
                 try {
                     driver.quit(); 
                 } catch (Exception e) {
-                    System.err.println("⚠️ Error cerrando driver: " + e.getMessage());
+                    System.err.println("âš ï¸ Error cerrando driver: " + e.getMessage());
                 }
             }
             
@@ -68,12 +62,8 @@ public class BaseTest {
                 service.stop();
             }
             
-            System.out.println("==============================================");
-            System.out.println("✓ WebDriver y ChromeDriverService cerrados");
-            System.out.println("==============================================");
-            
         } catch (Exception e) {
-            System.err.println("⚠️ Error en tearDown: " + e.getMessage());
+            System.err.println("âš ï¸ Error en tearDown: " + e.getMessage());
         } finally {
             driver = null;
             service = null;
@@ -82,7 +72,6 @@ public class BaseTest {
     
     protected void openTestPage() {
         driver.get(pageUrl);
-        System.out.println("→ Página de prueba cargada: " + driver.getTitle());
     }
     
     protected void pauseForDemo(int milliseconds) {
@@ -90,7 +79,6 @@ public class BaseTest {
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            System.out.println("⚠️ Pausa de demostración interrumpida");
         }
     }
     

@@ -1,4 +1,4 @@
-package pages;
+﻿package pages;
 
 import base.BasePage;
 import org.openqa.selenium.By;
@@ -28,17 +28,14 @@ public class DemoPage extends BasePage {
     
   
     public void clickLoadContent() {
-        System.out.println("\n>>> ESCENARIO 1: Carga Asíncrona <<<");
         clickElement(btnLoadContent);
     }
     
     public boolean waitForLoadingToDisappear() {
-        System.out.println("  → Esperando que desaparezca el indicador de carga...");
         return waitForElementToBeInvisible(loadingIndicator);
     }
     
     public void clickProcessData() {
-        System.out.println("  → Esperando que aparezca el botón 'Procesar Datos'...");
         clickElement(btnProcessData);
     }
     
@@ -47,13 +44,10 @@ public class DemoPage extends BasePage {
     }
     
     public void enterUsername(String username) {
-        System.out.println("\n>>> ESCENARIO 2: Botón que se Habilita <<<");
         typeText(inputUsername, username);
-        System.out.println("  → Validación asíncrona iniciada (2 segundos)...");
     }
     
     public void clickSubmitButton() {
-        System.out.println("  → Esperando que el botón se habilite...");
         clickElement(btnSubmit);
     }
     
@@ -62,12 +56,10 @@ public class DemoPage extends BasePage {
     }
     
     public void clickUpdateStatus() {
-        System.out.println("\n>>> ESCENARIO 3: Texto que Cambia Dinámicamente <<<");
         clickElement(btnUpdateStatus);
     }
     
     public boolean waitForStatusText(String expectedText) {
-        System.out.println("  → Esperando estado: '" + expectedText + "'...");
         return waitForTextToBePresentInElement(statusText, expectedText);
     }
     
@@ -76,17 +68,14 @@ public class DemoPage extends BasePage {
     }
 
     public void clickShowAlert() {
-        System.out.println("\n>>> ESCENARIO 4: Overlay que Desaparece <<<");
         clickElement(btnShowAlert);
     }
     
     public boolean waitForAlertToDisappear() {
-        System.out.println("  → Esperando que desaparezca la alerta temporal...");
         return waitForElementToBeInvisible(temporaryAlert);
     }
     
     public void clickAfterAlertButton() {
-        System.out.println("  → Esperando que aparezca el botón 'Acción Después de Alerta'...");
         clickElement(btnAfterAlert);
     }
     
@@ -96,8 +85,5 @@ public class DemoPage extends BasePage {
     
     public void navigateTo(String url) {
         driver.get(url);
-        System.out.println("\n==============================================");
-        System.out.println("  Página cargada: Demo - Esperas Explícitas");
-        System.out.println("==============================================");
     }
 }
