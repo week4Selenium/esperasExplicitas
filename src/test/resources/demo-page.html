@@ -183,14 +183,14 @@
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Demo: Esperas Explícitas con Selenium</h1>
+        <h1> Esperas Explícitas con Selenium</h1>
 
         <!-- 
             SECCIÓN 1: Elemento que se hace clickeable después de un tiempo
             Simula un botón deshabilitado que se habilita después de validación
         -->
         <div class="section">
-            <h2>⏱️ Escenario 1: Elemento que se Vuelve Clickeable</h2>
+            <h2> Escenario 1: Elemento que se Vuelve Clickeable</h2>
             <input type="text" id="username" placeholder="Ingrese nombre de usuario" 
                    oninput="validateForm()">
             
@@ -214,7 +214,7 @@
             Útil para modales, mensajes temporales, overlays
         -->
         <div class="section">
-            <h2>👁️ Escenario 2: Elemento que Desaparece</h2>
+            <h2>Escenario 2: Elemento que Desaparece</h2>
             <button id="btnShowAlert" onclick="showTemporaryAlert()">Mostrar Alerta Temporal</button>
             
             <div id="temporaryAlert" class="hidden"></div>
@@ -237,7 +237,7 @@
             Simula actualización de estado en tiempo real
         -->
         <div class="section">
-            <h2>🔄 Escenario 3: Texto que Cambia Dinámicamente</h2>
+            <h2>Escenario 3: Texto que Cambia Dinámicamente</h2>
             <button id="btnUpdateStatus" onclick="updateStatus()">Iniciar Proceso</button>
             
             <div id="statusDisplay" style="margin-top: 20px; font-size: 18px;">
@@ -257,7 +257,7 @@
             SIN esperas explícitas: El test intentará hacer click antes de que aparezca
         -->
         <div class="section">
-            <h2>📡 Escenario 4: Elemento que Aparece Después de Carga Asíncrona</h2>
+            <h2>Escenario 4: Elemento que Aparece Después de Carga Asíncrona</h2>
             <button id="btnLoadContent" onclick="loadAsyncContent()">Cargar Contenido Remoto</button>
             
             <!-- Este div permanece oculto hasta que se complete la "carga" -->

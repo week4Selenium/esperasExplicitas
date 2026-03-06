@@ -1,5 +1,2 @@
-/*
- * Archivo de configuración de Gradle
- * Define el nombre del proyecto raíz
- */
+
 rootProject.name = 'esperasExplicitas'
